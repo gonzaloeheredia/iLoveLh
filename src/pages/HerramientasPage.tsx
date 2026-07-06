@@ -12,12 +12,11 @@ export function HerramientasPage() {
 
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            <span className="text-white">Herramientas </span>
+            <span className="text-white">Conversor </span>
             <span className="text-accent">PDF</span>
           </h1>
           <p className="mt-5 text-base leading-relaxed text-text-muted sm:text-lg">
-            Herramientas privadas para abogados y profesionales. Todo se procesa en tu servidor,
-            con resultados guardados de forma segura.
+            Herramienta de conversor de documentos para profesionales del derecho.
           </p>
         </div>
 
