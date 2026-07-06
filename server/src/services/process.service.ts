@@ -63,6 +63,13 @@ export function getHistorial(): ProcessRecord[] {
   )
 }
 
+export function registerProcess(record: ProcessRecord): ProcessRecord {
+  const processes = readJson<ProcessRecord[]>(processesFile, [])
+  processes.unshift(record)
+  writeJson(processesFile, processes)
+  return record
+}
+
 export function saveProcess(body: SaveProcessInput): ProcessRecord {
   const id = randomUUID()
   const processOutputDir = path.join(outputDir, id)

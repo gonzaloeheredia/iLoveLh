@@ -16,6 +16,7 @@ function parseMaxFileSize(value: string | undefined): number {
 }
 
 const uploadDirRaw = process.env.UPLOAD_DIR ?? 'uploads'
+const clientOriginsRaw = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173'
 
 export const env = {
   port: Number(process.env.PORT ?? 3001),
@@ -25,4 +26,5 @@ export const env = {
     ? uploadDirRaw
     : path.join(serverRoot, uploadDirRaw),
   maxFileSize: parseMaxFileSize(process.env.MAX_FILE_SIZE),
+  clientOrigins: clientOriginsRaw.split(',').map((origin) => origin.trim()),
 } as const
