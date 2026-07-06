@@ -1,11 +1,36 @@
-# React + TypeScript + Vite
+# legalHub — Conversor PDF
 
-# A self-hosted document processing toolkit that runs entirely on your own infrastructure. Convert, merge, and split documents without sending files to third-party servers.
+A self-hosted document processing toolkit that runs entirely on your own infrastructure. Convert, merge, and split documents without sending files to third-party servers.
 
-# Why
+## Project structure
+
+```
+client/   → React + Vite frontend
+server/   → Express + TypeScript API
+```
+
+## Development
+
+```bash
+# Terminal 1 — API
+cd server
+npm install
+npm run dev
+
+# Terminal 2 — Frontend
+cd client
+npm install
+npm run dev
+```
+
+The frontend proxies `/api` requests to `http://localhost:3001`.
+
+## Why
+
 Most online document tools require uploading files to external servers, which creates compliance and confidentiality risks for organizations handling sensitive documents (legal, financial, medical, government). This tool keeps all processing on the client's server: files are uploaded, processed, and stored within your own environment, under your own security policies.
 
-# Features
+## Features
+
 - PDF to Word conversion — transform PDF documents into editable .docx files
 - Word to PDF conversion — export .docx documents to PDF with formatting preserved
 - Merge PDFs — combine multiple PDF files into a single document
@@ -13,7 +38,7 @@ Most online document tools require uploading files to external servers, which cr
 
 On-premise by design — all data lives on the client's server; no external API calls, no third-party storage
 
-# Data Privacy
+## Data Privacy
 
 - Files are processed locally on your server
 - No documents are transmitted to external services
