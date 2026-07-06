@@ -1,0 +1,62 @@
+[
+  {
+    "id": "sim-001",
+    "toolId": "unir-pdf",
+    "toolName": "Unir PDF",
+    "inputFiles": ["contrato_servicios.pdf", "anexo_clausulas.pdf", "firma_digital.pdf"],
+    "outputFiles": ["contrato_completo_unido.pdf"],
+    "createdAt": "2026-07-04T14:32:00.000Z",
+    "status": "completado",
+    "simulated": true
+  },
+  {
+    "id": "sim-002",
+    "toolId": "separar-pdf",
+    "toolName": "Separar PDF",
+    "inputFiles": ["expediente_2847.pdf"],
+    "outputFiles": ["expediente_2847_pagina_1.pdf", "expediente_2847_pagina_2.pdf", "expediente_2847_pagina_3.pdf"],
+    "createdAt": "2026-07-03T09:15:00.000Z",
+    "status": "completado",
+    "simulated": true
+  },
+  {
+    "id": "sim-003",
+    "toolId": "pdf-a-word",
+    "toolName": "PDF a Word",
+    "inputFiles": ["demanda_civil.pdf"],
+    "outputFiles": ["demanda_civil.docx"],
+    "createdAt": "2026-07-02T16:48:00.000Z",
+    "status": "completado",
+    "simulated": true
+  },
+  {
+    "id": "sim-004",
+    "toolId": "word-a-pdf",
+    "toolName": "Word a PDF",
+    "inputFiles": ["escritura_compraventa.docx"],
+    "outputFiles": ["escritura_compraventa.pdf"],
+    "createdAt": "2026-07-01T11:20:00.000Z",
+    "status": "completado",
+    "simulated": true
+  },
+  {
+    "id": "sim-005",
+    "toolId": "unir-pdf",
+    "toolName": "Unir PDF",
+    "inputFiles": ["informe_pericial.pdf", "dictamen_medico.pdf"],
+    "outputFiles": ["informe_pericial_completo.pdf"],
+    "createdAt": "2026-06-28T08:05:00.000Z",
+    "status": "completado",
+    "simulated": true
+  },
+  {
+    "id": "sim-006",
+    "toolId": "separar-pdf",
+    "toolName": "Separar PDF",
+    "inputFiles": ["acta_asamblea.pdf"],
+    "outputFiles": ["acta_asamblea_parte_1.pdf", "acta_asamblea_parte_2.pdf"],
+    "createdAt": "2026-06-25T17:30:00.000Z",
+    "status": "completado",
+    "simulated": true
+  }
+]

@@ -1,0 +1,48 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --color-bg-dark: #0a0514;
+  --color-bg-card: #120a1f;
+  --color-bg-elevated: #1a1028;
+  --color-accent: #9b87f5;
+  --color-accent-hover: #b4a3f7;
+  --color-accent-muted: #6b5b95;
+  --color-text-muted: #9ca3af;
+  --color-border: rgba(155, 135, 245, 0.15);
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2')
+    format('woff2');
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-dark);
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+.bg-glow {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(155, 135, 245, 0.18), transparent),
+    var(--color-bg-dark);
+}
