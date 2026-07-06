@@ -29,8 +29,8 @@ function App() {
           element={
             <ConversionPage
               config={pdfAWordConfig}
+              kind="pdf-to-word"
               outputExtension="docx"
-              processingLabel="PDF a Word"
             />
           }
         />
@@ -39,8 +39,8 @@ function App() {
           element={
             <ConversionPage
               config={wordAPdfConfig}
+              kind="word-to-pdf"
               outputExtension="pdf"
-              processingLabel="Word a PDF"
             />
           }
         />

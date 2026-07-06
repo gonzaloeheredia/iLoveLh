@@ -10,7 +10,7 @@ export function createApp() {
   app.use(
     cors({
       origin: env.clientOrigins,
-      exposedHeaders: ['Content-Disposition', 'X-Output-Dir'],
+      exposedHeaders: ['Content-Disposition', 'X-Output-Dir', 'X-Split-Count'],
     }),
   )
   app.use(express.json({ limit: '50mb' }))

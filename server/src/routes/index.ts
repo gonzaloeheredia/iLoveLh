@@ -4,11 +4,15 @@ import { uploadRouter } from './upload.routes.js'
 import { processRouter } from './process.routes.js'
 import { reportRouter } from './report.routes.js'
 import { mergeRouter } from './merge.routes.js'
+import { splitRouter } from './split.routes.js'
+import { conversionRouter } from './conversion.routes.js'
 
 export const apiRouter = Router()
 
 apiRouter.use('/health', healthRouter)
 apiRouter.use('/upload', uploadRouter)
 apiRouter.use('/merge', mergeRouter)
+apiRouter.use('/split', splitRouter)
+apiRouter.use(conversionRouter)
 apiRouter.use(processRouter)
 apiRouter.use(reportRouter)

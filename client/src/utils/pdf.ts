@@ -93,6 +93,10 @@ export async function splitPdf(
 export function downloadBlob(data: Uint8Array, filename: string) {
   const copy = new Uint8Array(data)
   const blob = new Blob([copy], { type: 'application/pdf' })
+  downloadFile(blob, filename)
+}
+
+export function downloadFile(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url

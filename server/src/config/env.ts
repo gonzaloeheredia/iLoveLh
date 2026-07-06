@@ -17,6 +17,15 @@ function parseMaxFileSize(value: string | undefined): number {
 
 const uploadDirRaw = process.env.UPLOAD_DIR ?? 'uploads'
 const clientOriginsRaw = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173'
+const libreOfficePathRaw = process.env.LIBREOFFICE_PATH?.trim().replace(/^["']|["']$/g, '')
+
+function parseTimeoutMs(value: string | undefined): number {
+  const parsed = Number(value ?? '60000')
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return 60_000
+  }
+  return parsed
+}
 
 export const env = {
   port: Number(process.env.PORT ?? 3001),
@@ -27,4 +36,6 @@ export const env = {
     : path.join(serverRoot, uploadDirRaw),
   maxFileSize: parseMaxFileSize(process.env.MAX_FILE_SIZE),
   clientOrigins: clientOriginsRaw.split(',').map((origin) => origin.trim()),
+  libreOfficePath: libreOfficePathRaw?.trim() || undefined,
+  conversionTimeoutMs: parseTimeoutMs(process.env.CONVERSION_TIMEOUT_MS),
 } as const
