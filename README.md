@@ -1,45 +1,49 @@
-# legalHub — Conversor PDF
+# legalHub — PDF Converter
 
-Herramienta self-hosted de procesamiento de documentos para profesionales del derecho. Convierte, une y separa PDFs sin enviar archivos a servidores de terceros.
+A self-hosted document processing toolkit for legal professionals. Convert, merge, and split PDFs without sending files to third-party servers.
 
 ---
 
-### Qué resuelve
+##  Product 
 
-Los equipos legales suelen depender de herramientas online que suben documentos sensibles (contratos, escritos, expedientes) a servidores externos. **legalHub** procesa todo en la infraestructura del cliente: los archivos se suben, procesan y almacenan bajo las políticas de seguridad propias de la organización.
+### What it solves
 
-### Funcionalidades disponibles
+Legal teams often rely on online tools that upload sensitive documents (contracts, briefs, case files) to external servers. **legalHub** processes everything on the client's own infrastructure: files are uploaded, processed, and stored under the organization's security policies.
 
-| Herramienta | Ruta en la app | Descripción |
+### Available features
+
+| Tool | App route | Description |
 |---|---|---|
-| **Unir PDF** | `/unir-pdf` | Combina varios PDFs en uno solo, respetando el orden elegido por el usuario |
-| **Separar PDF** | `/separar-pdf` | Divide un PDF por páginas individuales o por rangos (ej. `1-3, 5, 7-9`) |
-| **PDF a Word** | `/pdf-a-word` | Convierte PDF a `.docx` editable |
-| **Word a PDF** | `/word-a-pdf` | Convierte `.docx` a PDF |
-| **Historial** | `/historial` | Lista de operaciones realizadas en el servidor |
-| **Reportar problema** | `/reportar-problema` | Envío de reportes con capturas al administrador |
+| **Merge PDF** | `/unir-pdf` | Combines multiple PDFs into one, preserving user-defined order |
+| **Split PDF** | `/separar-pdf` | Splits a PDF into individual pages or by ranges (e.g. `1-3, 5, 7-9`) |
+| **PDF to Word** | `/pdf-a-word` | Converts PDF to editable `.docx` |
+| **Word to PDF** | `/word-a-pdf` | Converts `.docx` to PDF |
+| **History** | `/historial` | List of operations performed on the server |
+| **Report issue** | `/reportar-problema` | Submit bug reports with screenshots to the administrator |
 
-### Privacidad y datos
+### Privacy and data
 
-- Todo el procesamiento ocurre en el servidor propio; no hay llamadas a APIs externas ni almacenamiento en la nube.
-- Los resultados se guardan en `server/data/output/` (excluido de Git).
-- El historial de operaciones reales se persiste en `server/data/processes.json`.
-- Los archivos temporales de subida se eliminan automáticamente tras cada operación.
-- Adecuado para entornos con requisitos estrictos de confidencialidad o residencia de datos.
+- All processing runs on your own server; no external API calls or cloud storage.
+- Results are saved to `server/data/output/` (excluded from Git).
+- Real operation history is persisted in `server/data/processes.json`.
+- Temporary upload files are automatically deleted after each operation.
+- Suitable for environments with strict confidentiality or data residency requirements.
 
-### Flujo de usuario
+### User flow
 
-1. El usuario elige una herramienta desde la landing (`/herramienta`).
-2. Sube uno o más archivos desde el navegador.
-3. El frontend envía los archivos al backend vía API.
-4. El backend procesa, guarda el resultado y devuelve el archivo para descarga.
-5. La operación queda registrada en el historial.
+1. User selects a tool from the landing page (`/herramienta`).
+2. Uploads one or more files from the browser.
+3. The frontend sends files to the backend via API.
+4. The backend processes, saves the result, and returns the file for download.
+5. The operation is recorded in the history.
 
 ---
 
-### Arquitectura
+## Technical
 
-Monorepo con dos proyectos independientes en la raíz:
+### Architecture
+
+Monorepo with two independent projects at the root:
 
 ```
 IloveLH/
@@ -51,28 +55,28 @@ IloveLH/
 
 ```mermaid
 flowchart LR
-  Browser["Navegador"] --> Client["client/ :5173"]
+  Browser["Browser"] --> Client["client/ :5173"]
   Client -->|"POST /api/*"| Server["server/ :3001"]
   Server --> PdfLib["pdf-lib\n(merge / split)"]
-  Server --> LibreOffice["LibreOffice headless\n(conversiones)"]
-  Server --> Data["server/data/\noutput / historial"]
+  Server --> LibreOffice["LibreOffice headless\n(conversions)"]
+  Server --> Data["server/data/\noutput / history"]
 ```
 
-| Capa | Stack | Responsabilidad |
+| Layer | Stack | Responsibility |
 |---|---|---|
-| **client/** | React, Vite, Tailwind, pdf-lib (solo lectura de metadatos) | UI, subida de archivos, descarga de resultados |
-| **server/** | Express, multer, pdf-lib, archiver, LibreOffice | Procesamiento, almacenamiento, historial |
+| **client/** | React, Vite, Tailwind, pdf-lib (metadata only) | UI, file upload, result download |
+| **server/** | Express, multer, pdf-lib, archiver, LibreOffice | Processing, storage, history |
 
-### Requisitos previos
+### Prerequisites
 
-- **Node.js** 18 o superior
+- **Node.js** 18 or higher
 - **npm**
-- **LibreOffice** (solo para conversiones PDF ↔ Word)
-  - Windows: [LibreOffice](https://www.libreoffice.org/) o `winget install TheDocumentFoundation.LibreOffice`
+- **LibreOffice** (PDF ↔ Word conversions only)
+  - Windows: [LibreOffice](https://www.libreoffice.org/) or `winget install TheDocumentFoundation.LibreOffice`
   - Linux: `sudo apt install libreoffice`
   - macOS: `brew install --cask libreoffice`
 
-### Instalación
+### Installation
 
 ```bash
 git clone <repo-url>
@@ -81,28 +85,28 @@ cd IloveLH
 # Backend
 cd server
 npm install
-cp .env.example .env   # editar según el entorno
+cp .env.example .env   # edit for your environment
 
 # Frontend
 cd ../client
 npm install
-cp .env.example .env   # opcional en desarrollo con proxy
+cp .env.example .env   # optional when using the dev proxy
 ```
 
-### Variables de entorno
+### Environment variables
 
 #### `server/.env`
 
-| Variable | Default | Descripción |
+| Variable | Default | Description |
 |---|---|---|
-| `PORT` | `3001` | Puerto del API |
-| `UPLOAD_DIR` | `uploads` | Carpeta de archivos temporales (relativa a `server/`) |
-| `MAX_FILE_SIZE` | `52428800` | Tamaño máximo de subida en bytes (50 MB) |
-| `CLIENT_ORIGIN` | `http://localhost:5173,...` | Orígenes permitidos por CORS (separados por coma) |
-| `LIBREOFFICE_PATH` | _(auto-detect)_ | Ruta al ejecutable `soffice`. **En Windows, usar comillas si hay espacios** |
-| `CONVERSION_TIMEOUT_MS` | `60000` | Timeout de conversiones LibreOffice (ms) |
+| `PORT` | `3001` | API port |
+| `UPLOAD_DIR` | `uploads` | Temporary upload folder (relative to `server/`) |
+| `MAX_FILE_SIZE` | `52428800` | Max upload size in bytes (50 MB) |
+| `CLIENT_ORIGIN` | `http://localhost:5173,...` | CORS allowed origins (comma-separated) |
+| `LIBREOFFICE_PATH` | _(auto-detect)_ | Path to `soffice` executable. **On Windows, use quotes if the path contains spaces** |
+| `CONVERSION_TIMEOUT_MS` | `60000` | LibreOffice conversion timeout (ms) |
 
-Ejemplo Windows:
+Windows example:
 
 ```env
 LIBREOFFICE_PATH="C:\Program Files\LibreOffice\program\soffice.exe"
@@ -110,13 +114,13 @@ LIBREOFFICE_PATH="C:\Program Files\LibreOffice\program\soffice.exe"
 
 #### `client/.env`
 
-| Variable | Default | Descripción |
+| Variable | Default | Description |
 |---|---|---|
-| `VITE_API_URL` | _(vacío)_ | URL base del backend. Vacío = usa proxy de Vite en desarrollo |
+| `VITE_API_URL` | _(empty)_ | Backend base URL. Empty = use Vite proxy in development |
 
-### Desarrollo local
+### Local development
 
-Levantar **dos terminales**:
+Start **two terminals**:
 
 ```bash
 # Terminal 1 — API
@@ -128,175 +132,175 @@ cd client
 npm run dev
 ```
 
-- Frontend: `http://localhost:5173` (o el puerto que asigne Vite)
+- Frontend: `http://localhost:5173` (or whichever port Vite assigns)
 - Backend: `http://localhost:3001`
 
-#### Modos de conexión frontend ↔ backend
+#### Frontend ↔ backend connection modes
 
-| Modo | Config | Comportamiento |
+| Mode | Config | Behavior |
 |---|---|---|
-| **Proxy** (default) | `VITE_API_URL` vacío | Vite redirige `/api/*` → `localhost:3001` |
-| **Directo** | `VITE_API_URL=http://localhost:3001` | El browser llama al backend directo; requiere CORS configurado |
+| **Proxy** (default) | `VITE_API_URL` empty | Vite forwards `/api/*` → `localhost:3001` |
+| **Direct** | `VITE_API_URL=http://localhost:3001` | Browser calls the backend directly; requires CORS |
 
-Al arrancar, el server verifica LibreOffice y muestra en consola:
+On startup, the server checks for LibreOffice and logs:
 
 ```
 LibreOffice detectado: C:\Program Files\LibreOffice\program\soffice.exe
 ```
 
-Si no lo encuentra, las conversiones responden `503` pero el resto de herramientas sigue funcionando.
+If not found, conversion endpoints return `503` but all other tools keep working.
 
-### Build de producción
+### Production build
 
 ```bash
 # Backend
 cd server
 npm run build
-npm start          # ejecuta dist/index.js
+npm start          # runs dist/index.js
 
 # Frontend
 cd client
-npm run build      # genera client/dist/
-npm run preview    # preview local del build
+npm run build      # outputs to client/dist/
+npm run preview    # local preview of the build
 ```
 
-Servir `client/dist/` con nginx, Caddy o similar, apuntando `/api` al backend en el puerto configurado.
+Serve `client/dist/` with nginx, Caddy, or similar, proxying `/api` to the backend on the configured port.
 
-### API REST
+### REST API
 
 Base URL: `http://localhost:3001/api`
 
-#### Salud
+#### Health
 
-| Método | Ruta | Descripción |
+| Method | Route | Description |
 |---|---|---|
 | `GET` | `/health` | `{ status: "ok", timestamp: "..." }` |
 
-#### Procesamiento de documentos
+#### Document processing
 
-| Método | Ruta | Body (multipart) | Respuesta |
+| Method | Route | Body (multipart) | Response |
 |---|---|---|---|
-| `POST` | `/merge` | `files[]` — mín. 2 PDFs | PDF unido (`merged.pdf`) |
-| `POST` | `/split` | `file` (PDF), `ranges` (string) | ZIP con PDFs separados |
-| `POST` | `/pdf-to-word` | `file` (PDF) | DOCX convertido |
-| `POST` | `/word-to-pdf` | `file` (DOCX) | PDF convertido |
-| `POST` | `/upload` | `file` (PDF o DOCX) | Metadatos del archivo subido |
+| `POST` | `/merge` | `files[]` — min. 2 PDFs | Merged PDF (`merged.pdf`) |
+| `POST` | `/split` | `file` (PDF), `ranges` (string) | ZIP with split PDFs |
+| `POST` | `/pdf-to-word` | `file` (PDF) | Converted DOCX |
+| `POST` | `/word-to-pdf` | `file` (DOCX) | Converted PDF |
+| `POST` | `/upload` | `file` (PDF or DOCX) | Uploaded file metadata |
 
-**Parámetro `ranges` en `/split`:**
+**`ranges` parameter for `/split`:**
 
-- Por rangos: `1-3,5,7-9`
-- Todas las páginas: `all`
+- By range: `1-3,5,7-9`
+- All pages: `all`
 
-#### Historial y reportes
+#### History and reports
 
-| Método | Ruta | Descripción |
+| Method | Route | Description |
 |---|---|---|
-| `GET` | `/historial` | Lista de operaciones (reales + demo) |
-| `POST` | `/processes` | Registra una operación manualmente |
-| `POST` | `/reports` | Guarda un reporte de problema con capturas |
+| `GET` | `/historial` | Operation list (real + demo data) |
+| `POST` | `/processes` | Manually register an operation |
+| `POST` | `/reports` | Save a bug report with screenshots |
 
-#### Ejemplos curl
+#### curl examples
 
 ```bash
-# Unir PDFs
+# Merge PDFs
 curl -X POST http://localhost:3001/api/merge \
   -F "files=@doc1.pdf" -F "files=@doc2.pdf" \
   -o merged.pdf
 
-# Separar PDF
+# Split PDF
 curl -X POST http://localhost:3001/api/split \
-  -F "file=@documento.pdf" -F "ranges=1-3,5" \
-  -o resultado.zip
+  -F "file=@document.pdf" -F "ranges=1-3,5" \
+  -o result.zip
 
-# PDF a Word
+# PDF to Word
 curl -X POST http://localhost:3001/api/pdf-to-word \
-  -F "file=@documento.pdf" \
-  -o documento.docx
+  -F "file=@document.pdf" \
+  -o document.docx
 
-# Word a PDF
+# Word to PDF
 curl -X POST http://localhost:3001/api/word-to-pdf \
-  -F "file=@documento.docx" \
-  -o documento.pdf
+  -F "file=@document.docx" \
+  -o document.pdf
 ```
 
-### Estructura del backend
+### Backend structure
 
 ```
 server/src/
-├── index.ts              # Entry point + verificación LibreOffice
+├── index.ts              # Entry point + LibreOffice check
 ├── app.ts                # Express, CORS, middleware
-├── config/env.ts         # Variables de entorno
-├── routes/               # Definición de rutas
+├── config/env.ts         # Environment variables
+├── routes/               # Route definitions
 ├── controllers/          # Request / response
-├── services/             # Lógica de negocio
+├── services/             # Business logic
 │   ├── merge.service.ts
 │   ├── split.service.ts
 │   ├── conversion.service.ts
 │   ├── libreoffice.service.ts
 │   └── process.service.ts
-└── middleware/           # Upload, errores
+└── middleware/           # Upload, error handling
 ```
 
-### Almacenamiento de datos
+### Data storage
 
-| Ruta | Contenido | En Git |
+| Path | Contents | In Git |
 |---|---|---|
-| `server/uploads/` | Archivos temporales de subida | No |
-| `server/data/output/{uuid}/` | Resultados de cada operación | No |
-| `server/data/reports/` | Reportes de problemas | No |
-| `server/data/processes.json` | Historial de operaciones reales | No |
-| `server/data/historial.json` | Datos de demo para el historial | Sí |
+| `server/uploads/` | Temporary upload files | No |
+| `server/data/output/{uuid}/` | Result of each operation | No |
+| `server/data/reports/` | Bug reports | No |
+| `server/data/processes.json` | Real operation history | No |
+| `server/data/historial.json` | Demo data for the history UI | Yes |
 
-### Estructura del frontend
+### Frontend structure
 
 ```
 client/src/
-├── pages/                # Una página por herramienta
-├── components/           # UI reutilizable (formularios, dropzone, etc.)
-├── services/api.ts       # Cliente HTTP hacia el backend
-├── types/tools.ts        # Configuración de herramientas
-└── utils/pdf.ts          # Helpers de descarga
+├── pages/                # One page per tool
+├── components/           # Reusable UI (forms, dropzone, etc.)
+├── services/api.ts       # HTTP client for the backend
+├── types/tools.ts        # Tool configuration
+└── utils/pdf.ts          # Download helpers
 ```
 
-### Tecnologías por funcionalidad
+### Technology by feature
 
-| Funcionalidad | Motor |
+| Feature | Engine |
 |---|---|
-| Unir PDF | pdf-lib (Node) |
-| Separar PDF | pdf-lib + archiver (ZIP) |
+| Merge PDF | pdf-lib (Node) |
+| Split PDF | pdf-lib + archiver (ZIP) |
 | PDF ↔ Word | LibreOffice headless (`soffice --headless --convert-to`) |
-| Subida de archivos | multer |
-| Historial | JSON en disco |
+| File upload | multer |
+| History | JSON on disk |
 
-### Límites y errores comunes
+### Limits and common errors
 
-| Situación | Código HTTP | Mensaje |
+| Situation | HTTP code | Notes |
 |---|---|---|
-| Archivo no es PDF/DOCX | `400` | Validación de tipo |
-| Menos de 2 PDFs en merge | `400` | Mínimo de archivos |
-| Rangos inválidos en split | `400` | Parseo de rangos |
-| LibreOffice no instalado | `503` | Conversión no disponible |
-| Conversión > 60 s | `504` | Timeout |
-| Archivo > 50 MB | `400` | Límite de multer |
+| File is not PDF/DOCX | `400` | Type validation |
+| Fewer than 2 PDFs in merge | `400` | Minimum file count |
+| Invalid ranges in split | `400` | Range parsing |
+| LibreOffice not installed | `503` | Conversion unavailable |
+| Conversion > 60 s | `504` | Timeout |
+| File > 50 MB | `400` | multer limit |
 
 ### Troubleshooting
 
-**El server muestra aviso de LibreOffice pero está instalado**
+**Server shows LibreOffice warning but it is installed**
 
-- Verificar que `LIBREOFFICE_PATH` en `server/.env` esté entre comillas si la ruta tiene espacios.
-- Reiniciar el server tras editar `.env`.
+- Ensure `LIBREOFFICE_PATH` in `server/.env` is quoted if the path contains spaces.
+- Restart the server after editing `.env`.
 
-**Puerto 3001 en uso (`EADDRINUSE`)**
+**Port 3001 in use (`EADDRINUSE`)**
 
-- Detener la instancia previa del server o cambiar `PORT` en `.env`.
+- Stop the previous server instance or change `PORT` in `.env`.
 
-**El frontend no llega al backend**
+**Frontend cannot reach the backend**
 
-- Confirmar que el server está corriendo en `:3001`.
-- Si usás `VITE_API_URL`, verificar que `CLIENT_ORIGIN` incluya el puerto del frontend.
+- Confirm the server is running on `:3001`.
+- If using `VITE_API_URL`, verify `CLIENT_ORIGIN` includes the frontend port.
 
 ---
 
-## Licencia
+## License
 
-Proyecto privado — uso interno.
+Private project — internal use only.

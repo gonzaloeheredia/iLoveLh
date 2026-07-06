@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Badge } from '../components/Badge'
-import { fetchHistorial } from '../services/processService'
+import { ConfirmDialog } from '../components/ConfirmDialog'
+import { fetchHistorial, deleteProcessRecord } from '../services/processService'
 import type { ProcessRecord } from '../services/processService'
-import { Files, Scissors, FileText, ArrowRightLeft, Clock, Loader2 } from 'lucide-react'
+import { Files, Scissors, FileText, ArrowRightLeft, Clock, Loader2, Trash2 } from 'lucide-react'
 import type { ToolId } from '../types/tools'
 
 const toolIcons: Record<ToolId, typeof Files> = {
@@ -23,7 +24,13 @@ function formatDate(iso: string) {
   }).format(new Date(iso))
 }
 
-function HistorialCard({ record }: { record: ProcessRecord }) {
+interface HistorialCardProps {
+  record: ProcessRecord
+  onDelete: (record: ProcessRecord) => void
+  deleting: boolean
+}
+
+function HistorialCard({ record, onDelete, deleting }: HistorialCardProps) {
   const Icon = toolIcons[record.toolId]
 
   return (
@@ -48,9 +55,22 @@ function HistorialCard({ record }: { record: ProcessRecord }) {
             </div>
           </div>
         </div>
-        <span className="shrink-0 rounded-full bg-green-500/15 px-2.5 py-1 text-xs font-medium text-green-400">
-          {record.status}
-        </span>
+        <div className="flex shrink-0 items-center gap-2">
+          {!record.simulated && (
+            <button
+              type="button"
+              onClick={() => onDelete(record)}
+              disabled={deleting}
+              className="rounded-lg p-2 text-text-muted transition-colors hover:bg-red-500/10 hover:text-red-400 disabled:opacity-50"
+              aria-label="Eliminar proceso"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          )}
+          <span className="rounded-full bg-green-500/15 px-2.5 py-1 text-xs font-medium text-green-400">
+            {record.status}
+          </span>
+        </div>
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -89,6 +109,8 @@ export function HistorialPage() {
   const [records, setRecords] = useState<ProcessRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<ProcessRecord | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchHistorial()
@@ -96,6 +118,23 @@ export function HistorialPage() {
       .catch(() => setError('No se pudo cargar el historial.'))
       .finally(() => setLoading(false))
   }, [])
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDelete) return
+
+    setDeletingId(pendingDelete.id)
+    setError(null)
+
+    try {
+      await deleteProcessRecord(pendingDelete.id)
+      setRecords((prev) => prev.filter((record) => record.id !== pendingDelete.id))
+      setPendingDelete(null)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo eliminar el proceso.')
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   return (
     <div className="bg-glow min-h-screen">
@@ -141,15 +180,41 @@ export function HistorialPage() {
             </div>
           )}
 
-          {!loading && !error && records.length > 0 && (
+          {!loading && records.length > 0 && (
             <div className="space-y-4">
               {records.map((record) => (
-                <HistorialCard key={record.id} record={record} />
+                <HistorialCard
+                  key={record.id}
+                  record={record}
+                  onDelete={setPendingDelete}
+                  deleting={deletingId === record.id}
+                />
               ))}
             </div>
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="¿Eliminar este proceso?"
+        message={
+          pendingDelete ? (
+            <>
+              Se eliminará el registro de <strong className="text-white">{pendingDelete.toolName}</strong>{' '}
+              y todos sus archivos en{' '}
+              <span className="font-mono text-white/80">{pendingDelete.outputDir ?? 'data/output'}</span>.
+              Esta acción no se puede deshacer.
+            </>
+          ) : null
+        }
+        confirmLabel="Eliminar"
+        loading={deletingId !== null}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          if (deletingId === null) setPendingDelete(null)
+        }}
+      />
     </div>
   )
 }

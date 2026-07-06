@@ -53,6 +53,17 @@ export async function fetchHistorial(): Promise<ProcessRecord[]> {
   return response.json()
 }
 
+export async function deleteProcessRecord(id: string): Promise<void> {
+  const response = await fetch(`/api/processes/${id}`, {
+    method: 'DELETE',
+  })
+
+  if (!response.ok) {
+    const body = (await response.json().catch(() => null)) as { error?: string } | null
+    throw new Error(body?.error ?? 'No se pudo eliminar el proceso.')
+  }
+}
+
 function uint8ToBase64(data: Uint8Array): string {
   let binary = ''
   const chunk = 0x8000

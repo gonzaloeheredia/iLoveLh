@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { env } from '../config/env.js'
+import { AppError } from '../middleware/error.middleware.js'
 
 export interface ProcessRecord {
   id: string
@@ -68,6 +69,27 @@ export function registerProcess(record: ProcessRecord): ProcessRecord {
   processes.unshift(record)
   writeJson(processesFile, processes)
   return record
+}
+
+export function deleteProcess(id: string): void {
+  const processes = readJson<ProcessRecord[]>(processesFile, [])
+  const index = processes.findIndex((process) => process.id === id)
+
+  if (index === -1) {
+    const simulated = readJson<ProcessRecord[]>(historialFile, [])
+    if (simulated.some((process) => process.id === id)) {
+      throw new AppError(400, 'No se pueden eliminar procesos simulados.')
+    }
+    throw new AppError(404, 'Proceso no encontrado.')
+  }
+
+  const processOutputDir = path.join(outputDir, id)
+  if (fs.existsSync(processOutputDir)) {
+    fs.rmSync(processOutputDir, { recursive: true, force: true })
+  }
+
+  processes.splice(index, 1)
+  writeJson(processesFile, processes)
 }
 
 export function saveProcess(body: SaveProcessInput): ProcessRecord {

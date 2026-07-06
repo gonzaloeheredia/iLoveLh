@@ -3,14 +3,14 @@ import { Link } from 'react-router-dom'
 export function Logo() {
   return (
     <Link to="/herramienta" className="block shrink-0" aria-label="legalHub">
-      <div className="h-9 w-9 overflow-hidden">
-        <img
-          src="/logo.png"
-          alt=""
-          className="h-9 w-auto max-w-none select-none"
-          draggable={false}
-        />
-      </div>
+      <img
+        src="/logo.png"
+        alt="legalHub"
+        className="h-16 w-auto select-none"
+        draggable={false}
+        width={322}
+        height={178}
+      />
     </Link>
   )
 }
