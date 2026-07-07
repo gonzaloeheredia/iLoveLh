@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { FileText, Languages, Loader2 } from 'lucide-react'
 import { DropZone } from './DropZone'
 import { ActionButton, StatusMessage } from './ActionButton'
-import { translatePdf } from '../services/api'
+import { translatePdf, ApiError } from '../services/api'
 import { downloadFile } from '../utils/pdf'
 import type { ToolConfig } from '../types/tools'
 
@@ -53,7 +53,11 @@ export function PdfTranslateForm({ config }: PdfTranslateFormProps) {
       })
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Hubo un error al traducir el PDF.'
+        err instanceof ApiError && err.status === 429
+          ? 'Límite de tokens alcanzado. Tu plan incluye 10.000 tokens por sesión del servidor. Consultá Estadísticas para ver el consumo o reiniciá el servidor para simular un nuevo ciclo.'
+          : err instanceof Error
+            ? err.message
+            : 'Hubo un error al traducir el PDF.'
       setStatus({ type: 'error', message })
     } finally {
       setLoading(false)

@@ -8,6 +8,7 @@ import { PDFDocument } from 'pdf-lib'
 import { env } from '../config/env.js'
 import { AppError } from '../middleware/error.middleware.js'
 import { registerProcess } from './process.service.js'
+import { recordSuccess } from './stats.service.js'
 
 export interface SplitInput {
   filePath: string
@@ -145,6 +146,8 @@ export async function splitPdfFile(input: SplitInput): Promise<SplitResult> {
     createdAt: new Date().toISOString(),
     status: 'completado',
   })
+
+  recordSuccess('separar-pdf')
 
   return {
     zipBuffer,

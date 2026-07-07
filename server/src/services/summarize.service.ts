@@ -3,6 +3,7 @@ import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { env } from '../config/env.js'
 import { registerProcess } from './process.service.js'
+import { assertTokenBudgetAvailable, recordSuccess } from './stats.service.js'
 import { extractTextFromPdf } from './pdf-text.service.js'
 import { summarizeTextWithGemini } from './gemini.service.js'
 import { buildSummaryPdf } from './summary-pdf.service.js'
@@ -20,8 +21,10 @@ export interface SummarizeResult {
 }
 
 export async function summarizePdf(input: SummarizeInput): Promise<SummarizeResult> {
+  assertTokenBudgetAvailable()
+
   const extractedText = await extractTextFromPdf(input.inputPath)
-  const summaryText = await summarizeTextWithGemini(extractedText)
+  const { text: summaryText, tokensUsed } = await summarizeTextWithGemini(extractedText)
   const pdfBytes = await buildSummaryPdf(summaryText, input.originalName)
 
   const baseName = buildDownloadFilename(input.originalName, 'pdf').replace(/\.pdf$/i, '')
@@ -45,6 +48,8 @@ export async function summarizePdf(input: SummarizeInput): Promise<SummarizeResu
     createdAt: new Date().toISOString(),
     status: 'completado',
   })
+
+  recordSuccess('resumir-pdf', tokensUsed)
 
   return {
     buffer: Buffer.from(pdfBytes),

@@ -3,6 +3,7 @@ import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { env } from '../config/env.js'
 import { registerProcess } from './process.service.js'
+import { assertTokenBudgetAvailable, recordSuccess } from './stats.service.js'
 import { extractPageTextsFromPdf } from './pdf-text.service.js'
 import { translatePagesWithGemini } from './gemini.service.js'
 import { buildTranslatedPdf } from './summary-pdf.service.js'
@@ -27,8 +28,13 @@ export function buildTranslatedFilename(originalName: string, targetLanguage: st
 }
 
 export async function translatePdf(input: TranslateInput): Promise<TranslateResult> {
+  assertTokenBudgetAvailable()
+
   const pageTexts = await extractPageTextsFromPdf(input.inputPath)
-  const translatedText = await translatePagesWithGemini(pageTexts, input.targetLanguage)
+  const { text: translatedText, tokensUsed } = await translatePagesWithGemini(
+    pageTexts,
+    input.targetLanguage,
+  )
   const pdfBytes = await buildTranslatedPdf(
     translatedText,
     input.originalName,
@@ -55,6 +61,8 @@ export async function translatePdf(input: TranslateInput): Promise<TranslateResu
     createdAt: new Date().toISOString(),
     status: 'completado',
   })
+
+  recordSuccess('traducir-pdf', tokensUsed)
 
   return {
     buffer: Buffer.from(pdfBytes),

@@ -8,6 +8,7 @@ import { splitRouter } from './split.routes.js'
 import { conversionRouter } from './conversion.routes.js'
 import { summarizeRouter } from './summarize.routes.js'
 import { translateRouter } from './translate.routes.js'
+import { statsRouter } from './stats.routes.js'
 
 export const apiRouter = Router()
 
@@ -20,3 +21,4 @@ apiRouter.use('/translate', translateRouter)
 apiRouter.use(conversionRouter)
 apiRouter.use(processRouter)
 apiRouter.use(reportRouter)
+apiRouter.use('/stats', statsRouter)

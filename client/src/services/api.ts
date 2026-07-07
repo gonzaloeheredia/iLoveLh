@@ -4,6 +4,55 @@ function apiUrl(path: string): string {
   return `${API_URL}${path}`
 }
 
+export class ApiError extends Error {
+  status: number
+  code?: string
+
+  constructor(message: string, status: number, code?: string) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
+    this.code = code
+  }
+}
+
+async function parseErrorResponse(response: Response, fallback: string): Promise<ApiError> {
+  const body = (await response.json().catch(() => null)) as { error?: string; code?: string } | null
+  return new ApiError(body?.error ?? fallback, response.status, body?.code)
+}
+
+export interface UsageStats {
+  serverStartedAt: string
+  tokenLimit: number
+  tokensUsed: number
+  tokensRemaining: number
+  tokenUsagePercent: number
+  tokensByTool: {
+    'resumir-pdf': number
+    'traducir-pdf': number
+  }
+  operationsByTool: Record<
+    | 'unir-pdf'
+    | 'separar-pdf'
+    | 'pdf-a-word'
+    | 'word-a-pdf'
+    | 'resumir-pdf'
+    | 'traducir-pdf',
+    number
+  >
+  totalOperations: number
+}
+
+export async function fetchStats(): Promise<UsageStats> {
+  const response = await fetch(apiUrl('/api/stats'))
+
+  if (!response.ok) {
+    throw await parseErrorResponse(response, 'No se pudieron cargar las estadísticas.')
+  }
+
+  return response.json() as Promise<UsageStats>
+}
+
 export async function mergePdfs(files: File[]): Promise<Blob> {
   const formData = new FormData()
   for (const file of files) {
@@ -16,8 +65,7 @@ export async function mergePdfs(files: File[]): Promise<Blob> {
   })
 
   if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as { error?: string } | null
-    throw new Error(body?.error ?? 'Hubo un error al unir los PDFs.')
+    throw await parseErrorResponse(response, 'Hubo un error al unir los PDFs.')
   }
 
   return response.blob()
@@ -40,8 +88,7 @@ export async function splitPdf(file: File, ranges: string): Promise<SplitPdfResu
   })
 
   if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as { error?: string } | null
-    throw new Error(body?.error ?? 'Hubo un error al separar el PDF.')
+    throw await parseErrorResponse(response, 'Hubo un error al separar el PDF.')
   }
 
   const disposition = response.headers.get('Content-Disposition')
@@ -84,8 +131,7 @@ async function convertFile(
   })
 
   if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as { error?: string } | null
-    throw new Error(body?.error ?? errorMessage)
+    throw await parseErrorResponse(response, errorMessage)
   }
 
   const disposition = response.headers.get('Content-Disposition')

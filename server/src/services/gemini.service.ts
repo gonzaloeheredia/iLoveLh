@@ -36,6 +36,19 @@ function assertGeminiAvailable(): void {
   }
 }
 
+export interface GeminiTextResult {
+  text: string
+  tokensUsed: number
+}
+
+function extractTokensUsed(response: { usageMetadata?: { totalTokenCount?: number; promptTokenCount?: number; candidatesTokenCount?: number } }): number {
+  const usage = response.usageMetadata
+  if (usage?.totalTokenCount != null) return usage.totalTokenCount
+  const prompt = usage?.promptTokenCount ?? 0
+  const candidates = usage?.candidatesTokenCount ?? 0
+  return prompt + candidates
+}
+
 function buildPrompt(text: string, truncated: boolean): string {
   const truncationNote = truncated
     ? '\n\nNota: el documento fue truncado por longitud; resumí solo el fragmento provisto.'
@@ -75,7 +88,7 @@ ${text}
 """`.trim()
 }
 
-export async function summarizeTextWithGemini(text: string): Promise<string> {
+export async function summarizeTextWithGemini(text: string): Promise<GeminiTextResult> {
   assertGeminiAvailable()
 
   const maxChars = env.summarizeMaxTextChars
@@ -93,7 +106,10 @@ export async function summarizeTextWithGemini(text: string): Promise<string> {
       throw new AppError(500, 'Gemini no devolvió un resumen.')
     }
 
-    return summary
+    return {
+      text: summary,
+      tokensUsed: extractTokensUsed(result.response),
+    }
   } catch (error) {
     if (error instanceof AppError) throw error
     const message = error instanceof Error ? error.message : 'Error desconocido'
@@ -154,7 +170,7 @@ ${text}
 """`.trim()
 }
 
-async function generateGeminiText(prompt: string, errorContext: string): Promise<string> {
+async function generateGeminiText(prompt: string, errorContext: string): Promise<GeminiTextResult> {
   assertGeminiAvailable()
 
   const genAI = new GoogleGenerativeAI(env.geminiApiKey!)
@@ -168,7 +184,10 @@ async function generateGeminiText(prompt: string, errorContext: string): Promise
       throw new AppError(500, `Gemini no devolvió ${errorContext}.`)
     }
 
-    return output
+    return {
+      text: output,
+      tokensUsed: extractTokensUsed(result.response),
+    }
   } catch (error) {
     if (error instanceof AppError) throw error
     const message = error instanceof Error ? error.message : 'Error desconocido'
@@ -179,7 +198,7 @@ async function generateGeminiText(prompt: string, errorContext: string): Promise
 export async function translateTextWithGemini(
   text: string,
   targetLanguage: string,
-): Promise<string> {
+): Promise<GeminiTextResult> {
   return generateGeminiText(buildTranslationPrompt(text, targetLanguage), 'una traducción')
 }
 
@@ -245,7 +264,7 @@ function buildPageBatches(pages: string[], maxChars: number): string[] {
 export async function translatePagesWithGemini(
   pages: string[],
   targetLanguage: string,
-): Promise<string> {
+): Promise<GeminiTextResult> {
   const batchCharLimit = Math.floor(env.summarizeMaxTextChars * 0.85)
   const fullText = pages.join('\n\n')
 
@@ -255,10 +274,16 @@ export async function translatePagesWithGemini(
 
   const batches = buildPageBatches(pages, batchCharLimit)
   const translatedParts: string[] = []
+  let tokensUsed = 0
 
   for (const batch of batches) {
-    translatedParts.push(await translateTextWithGemini(batch, targetLanguage))
+    const result = await translateTextWithGemini(batch, targetLanguage)
+    translatedParts.push(result.text)
+    tokensUsed += result.tokensUsed
   }
 
-  return translatedParts.join('\n\n')
+  return {
+    text: translatedParts.join('\n\n'),
+    tokensUsed,
+  }
 }

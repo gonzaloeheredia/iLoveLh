@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Power } from 'lucide-react'
 import { PAGE_X_PADDING } from './PageContainer'
 import { tools } from '../types/tools'
 import { Logo } from './Logo'
@@ -7,6 +8,7 @@ import { logout } from '../auth/session'
 const navLinks = [
   { label: 'Herramienta', href: '/herramienta' },
   { label: 'Historial', href: '/historial' },
+  { label: 'Estadísticas', href: '/estadisticas' },
   { label: 'Reportar un problema', href: '/reportar-problema' },
 ]
 
@@ -20,6 +22,7 @@ export function Navbar({ variant = 'default' }: NavbarProps) {
   const isHerramienta =
     location.pathname === '/herramienta' || tools.some((t) => t.path === location.pathname)
   const isHistorial = location.pathname === '/historial'
+  const isEstadisticas = location.pathname === '/estadisticas'
   const isReportar = location.pathname === '/reportar-problema'
 
   const handleLogout = () => {
@@ -42,6 +45,7 @@ export function Navbar({ variant = 'default' }: NavbarProps) {
             const isActive =
               (link.label === 'Herramienta' && isHerramienta) ||
               (link.label === 'Historial' && isHistorial) ||
+              (link.label === 'Estadísticas' && isEstadisticas) ||
               (link.label === 'Reportar un problema' && isReportar)
 
             return (
@@ -67,9 +71,11 @@ export function Navbar({ variant = 'default' }: NavbarProps) {
           <button
             type="button"
             onClick={handleLogout}
-            className="text-sm text-text-muted transition-colors hover:text-white"
+            aria-label="Salir"
+            title="Salir"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-bg-elevated text-text-muted transition-colors hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-400"
           >
-            Salir
+            <Power className="h-4 w-4" strokeWidth={2} />
           </button>
         </div>
         )}

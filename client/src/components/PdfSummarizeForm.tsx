@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { FileText, Loader2, Sparkles } from 'lucide-react'
 import { DropZone } from './DropZone'
 import { ActionButton, StatusMessage } from './ActionButton'
-import { summarizePdf } from '../services/api'
+import { summarizePdf, ApiError } from '../services/api'
 import { downloadFile } from '../utils/pdf'
 import type { ToolConfig } from '../types/tools'
 
@@ -42,7 +42,11 @@ export function PdfSummarizeForm({ config }: PdfSummarizeFormProps) {
       })
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Hubo un error al generar el resumen.'
+        err instanceof ApiError && err.status === 429
+          ? 'Límite de tokens alcanzado. Tu plan incluye 10.000 tokens por sesión del servidor. Consultá Estadísticas para ver el consumo o reiniciá el servidor para simular un nuevo ciclo.'
+          : err instanceof Error
+            ? err.message
+            : 'Hubo un error al generar el resumen.'
       setStatus({ type: 'error', message })
     } finally {
       setLoading(false)

@@ -5,6 +5,7 @@ import { PDFDocument } from 'pdf-lib'
 import { env } from '../config/env.js'
 import { AppError } from '../middleware/error.middleware.js'
 import { registerProcess } from './process.service.js'
+import { recordSuccess } from './stats.service.js'
 
 const OUTPUT_FILENAME = 'documento-unido.pdf'
 
@@ -59,6 +60,8 @@ export async function mergePdfFiles(files: MergeInputFile[]): Promise<MergeResul
     createdAt: new Date().toISOString(),
     status: 'completado',
   })
+
+  recordSuccess('unir-pdf')
 
   return {
     buffer,

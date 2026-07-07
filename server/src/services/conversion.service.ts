@@ -3,6 +3,7 @@ import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { env } from '../config/env.js'
 import { registerProcess } from './process.service.js'
+import { recordSuccess, type StatsToolId } from './stats.service.js'
 import { convertWithLibreOffice } from './libreoffice.service.js'
 import { convertPdfToDocx } from './pdf2docx.service.js'
 import { AppError } from '../middleware/error.middleware.js'
@@ -55,6 +56,8 @@ function persistConversionResult(
     createdAt: new Date().toISOString(),
     status: 'completado',
   })
+
+  recordSuccess(toolId as StatsToolId)
 
   return { buffer, filename, outputDir }
 }

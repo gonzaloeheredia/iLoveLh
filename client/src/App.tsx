@@ -9,6 +9,7 @@ import { HistorialPage } from './pages/HistorialPage'
 import { ReportarProblemaPage } from './pages/ReportarProblemaPage'
 import { ResumirPdfPage } from './pages/ResumirPdfPage'
 import { TraducirPdfPage } from './pages/TraducirPdfPage'
+import { EstadisticasPage } from './pages/EstadisticasPage'
 import { LoginPage } from './pages/LoginPage'
 import { getToolById } from './types/tools'
 
@@ -26,6 +27,7 @@ function AppLayout() {
       <Routes>
         <Route path="/herramienta" element={<HerramientasPage />} />
         <Route path="/historial" element={<HistorialPage />} />
+        <Route path="/estadisticas" element={<EstadisticasPage />} />
         <Route path="/reportar-problema" element={<ReportarProblemaPage />} />
         <Route path="/unir-pdf" element={<UnirPdfPage config={unirConfig} />} />
         <Route path="/separar-pdf" element={<SepararPdfPage config={separarConfig} />} />

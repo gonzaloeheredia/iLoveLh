@@ -40,20 +40,20 @@ export function ReportarProblemaPage() {
   }
 
   return (
-    <PageContainer width="sm">
+    <PageContainer width="3xl">
       <BackButton />
 
       <div className="mb-10 flex justify-center">
         <Badge />
       </div>
 
-      <div className="mx-auto max-w-xl text-center">
+      <div className="mx-auto max-w-2xl text-center">
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
           <span className="text-white">Reportar un </span>
           <span className="text-accent">problema</span>
         </h1>
         <p className="mt-5 text-base leading-relaxed text-text-muted sm:text-lg">
-          Contanos qué falló o qué no funciona como esperabas. Podés adjuntar capturas de pantalla
+          Contanos qué falló o qué no funcionó como esperabas. Podés adjuntar capturas de pantalla
           para ayudarnos a entender mejor el problema.
         </p>
       </div>
