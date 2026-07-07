@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Badge } from '../components/Badge'
+import { BackButton } from '../components/BackButton'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { fetchHistorial, deleteProcessRecord } from '../services/processService'
 import type { ProcessRecord } from '../services/processService'
-import { Files, Scissors, FileText, ArrowRightLeft, Clock, Loader2, Trash2 } from 'lucide-react'
+import { Files, Scissors, FileText, ArrowRightLeft, Clock, Loader2, Trash2, Sparkles, Languages } from 'lucide-react'
 import type { ToolId } from '../types/tools'
 
 const toolIcons: Record<ToolId, typeof Files> = {
@@ -12,6 +13,8 @@ const toolIcons: Record<ToolId, typeof Files> = {
   'separar-pdf': Scissors,
   'pdf-a-word': FileText,
   'word-a-pdf': ArrowRightLeft,
+  'resumir-pdf': Sparkles,
+  'traducir-pdf': Languages,
 }
 
 function formatDate(iso: string) {
@@ -139,6 +142,7 @@ export function HistorialPage() {
   return (
     <div className="bg-glow min-h-screen">
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:py-16">
+        <BackButton />
         <div className="mb-8 flex justify-center">
           <Badge />
         </div>

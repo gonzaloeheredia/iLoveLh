@@ -4,10 +4,19 @@ import { randomUUID } from 'node:crypto'
 import { env } from '../config/env.js'
 import { registerProcess } from './process.service.js'
 import { convertWithLibreOffice } from './libreoffice.service.js'
+import { convertPdfToDocx } from './pdf2docx.service.js'
+import { AppError } from '../middleware/error.middleware.js'
+import {
+  buildDownloadFilename,
+  buildInternalStagingBasename,
+  buildInternalStagingPath,
+  detectSourceExtension,
+} from '../utils/filename.util.js'
 
 export interface ConversionInput {
   inputPath: string
   originalName: string
+  sourceMimeType: string
   workDir: string
 }
 
@@ -17,33 +26,15 @@ export interface ConversionResult {
   outputDir: string
 }
 
-function sanitizeFilename(name: string): string {
-  return name.replace(/[^\w.-]/g, '_')
-}
-
-async function runConversion(
+function persistConversionResult(
   input: ConversionInput,
-  targetFormat: string,
+  outputPath: string,
   expectedExtension: string,
   toolId: 'pdf-a-word' | 'word-a-pdf',
   toolName: string,
-): Promise<ConversionResult> {
-  const stagedInputPath = path.join(
-    input.workDir,
-    sanitizeFilename(path.basename(input.originalName)),
-  )
-  fs.copyFileSync(input.inputPath, stagedInputPath)
-
-  const outputPath = await convertWithLibreOffice(
-    stagedInputPath,
-    input.workDir,
-    targetFormat,
-    expectedExtension,
-  )
-
+): ConversionResult {
   const buffer = fs.readFileSync(outputPath)
-  const filename = path.basename(input.originalName, path.extname(input.originalName)) +
-    `.${expectedExtension}`
+  const filename = buildDownloadFilename(input.originalName, expectedExtension)
 
   const id = randomUUID()
   const outputDirPath = path.join(env.dataDir, 'output', id)
@@ -68,6 +59,20 @@ async function runConversion(
   return { buffer, filename, outputDir }
 }
 
+function stageInputFile(input: ConversionInput): {
+  detectedSourceExtension: string
+  stagedInputPath: string
+  internalBasename: string
+} {
+  const detectedSourceExtension = detectSourceExtension(input.originalName, input.sourceMimeType)
+  const stagedInputPath = buildInternalStagingPath(input.workDir, detectedSourceExtension)
+  const internalBasename = buildInternalStagingBasename(input.workDir)
+
+  fs.copyFileSync(input.inputPath, stagedInputPath)
+
+  return { detectedSourceExtension, stagedInputPath, internalBasename }
+}
+
 export function createConversionWorkDir(): string {
   const workDir = path.join(env.uploadDir, `convert-${randomUUID()}`)
   fs.mkdirSync(workDir, { recursive: true })
@@ -75,9 +80,41 @@ export function createConversionWorkDir(): string {
 }
 
 export async function convertPdfToWord(input: ConversionInput): Promise<ConversionResult> {
-  return runConversion(input, 'docx', 'docx', 'pdf-a-word', 'PDF a Word')
+  const { detectedSourceExtension, stagedInputPath, internalBasename } = stageInputFile(input)
+  const expectedExtension = 'docx'
+  const outputPath = path.join(input.workDir, `${internalBasename}.${expectedExtension}`)
+
+  console.log(
+    `[Conversion] PDF a Word | origin ext=${detectedSourceExtension} | staged input ext=${detectedSourceExtension} | target ext=${expectedExtension}`,
+  )
+  console.log(`[Conversion] staged input path=${stagedInputPath}`)
+  console.log(`[Conversion] output path=${outputPath}`)
+
+  await convertPdfToDocx(stagedInputPath, outputPath)
+
+  if (!fs.existsSync(outputPath)) {
+    throw new AppError(500, 'pdf2docx no generó el archivo DOCX esperado.')
+  }
+
+  return persistConversionResult(input, outputPath, expectedExtension, 'pdf-a-word', 'PDF a Word')
 }
 
 export async function convertWordToPdf(input: ConversionInput): Promise<ConversionResult> {
-  return runConversion(input, 'pdf', 'pdf', 'word-a-pdf', 'Word a PDF')
+  const { detectedSourceExtension, stagedInputPath } = stageInputFile(input)
+  const targetFormat = 'pdf'
+  const expectedExtension = 'pdf'
+
+  console.log(
+    `[Conversion] Word a PDF | origin ext=${detectedSourceExtension} | staged input ext=${detectedSourceExtension} | target ext=${expectedExtension}`,
+  )
+  console.log(`[Conversion] staged input path=${stagedInputPath}`)
+
+  const outputPath = await convertWithLibreOffice(
+    stagedInputPath,
+    input.workDir,
+    targetFormat,
+    expectedExtension,
+  )
+
+  return persistConversionResult(input, outputPath, expectedExtension, 'word-a-pdf', 'Word a PDF')
 }

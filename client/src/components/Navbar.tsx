@@ -1,6 +1,7 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { tools } from '../types/tools'
 import { Logo } from './Logo'
+import { logout } from '../auth/session'
 
 const navLinks = [
   { label: 'Herramienta', href: '/herramienta' },
@@ -10,10 +11,16 @@ const navLinks = [
 
 export function Navbar() {
   const location = useLocation()
+  const navigate = useNavigate()
   const isHerramienta =
     location.pathname === '/herramienta' || tools.some((t) => t.path === location.pathname)
   const isHistorial = location.pathname === '/historial'
   const isReportar = location.pathname === '/reportar-problema'
+
+  const handleLogout = () => {
+    logout()
+    navigate('/', { replace: true })
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-bg-dark/80 backdrop-blur-md">
@@ -47,6 +54,13 @@ export function Navbar() {
           >
             Reportar
           </Link>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="text-sm text-text-muted transition-colors hover:text-white"
+          >
+            Salir
+          </button>
         </div>
       </nav>
     </header>

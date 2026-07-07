@@ -1,22 +1,16 @@
 import { useState } from 'react'
-import { FileText, Loader2 } from 'lucide-react'
+import { FileText, Loader2, Sparkles } from 'lucide-react'
 import { DropZone } from './DropZone'
 import { ActionButton, StatusMessage } from './ActionButton'
-import { convertDocument, type ConversionKind } from '../services/api'
+import { summarizePdf } from '../services/api'
 import { downloadFile } from '../utils/pdf'
 import type { ToolConfig } from '../types/tools'
 
-interface PdfConversionFormProps {
+interface PdfSummarizeFormProps {
   config: ToolConfig
-  kind: ConversionKind
-  outputExtension: string
 }
 
-function acceptToInputValue(accept: Record<string, string[]>): string {
-  return Object.values(accept).flat().join(',')
-}
-
-export function PdfConversionForm({ config, kind, outputExtension }: PdfConversionFormProps) {
+export function PdfSummarizeForm({ config }: PdfSummarizeFormProps) {
   const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(
@@ -33,22 +27,22 @@ export function PdfConversionForm({ config, kind, outputExtension }: PdfConversi
     setStatus(null)
   }
 
-  const handleConvert = async () => {
+  const handleSummarize = async () => {
     if (!file) return
 
     setLoading(true)
     setStatus(null)
 
     try {
-      const { blob, filename } = await convertDocument(kind, file)
+      const { blob, filename } = await summarizePdf(file)
       downloadFile(blob, filename)
       setStatus({
         type: 'success',
-        message: `¡Conversión completada! El archivo se guardó en el servidor.`,
+        message: '¡Resumen generado! El PDF se descargó y quedó guardado en el servidor.',
       })
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Hubo un error al convertir el documento.'
+        err instanceof Error ? err.message : 'Hubo un error al generar el resumen.'
       setStatus({ type: 'error', message })
     } finally {
       setLoading(false)
@@ -61,7 +55,7 @@ export function PdfConversionForm({ config, kind, outputExtension }: PdfConversi
   }
 
   const outputName = file
-    ? file.name.replace(/\.[^.]+$/, `.${outputExtension}`)
+    ? file.name.replace(/\.pdf$/i, '-resumen.pdf')
     : ''
 
   if (!file) {
@@ -97,11 +91,11 @@ export function PdfConversionForm({ config, kind, outputExtension }: PdfConversi
           >
             Eliminar
           </button>
-          <label className="cursor-pointer text-sm text-text-muted transition-colors hover:text-white has-disabled:opacity-50">
+          <label className="cursor-pointer text-sm text-text-muted transition-colors hover:text-white">
             Cambiar
             <input
               type="file"
-              accept={acceptToInputValue(config.accept)}
+              accept=".pdf,application/pdf"
               className="hidden"
               disabled={loading}
               onChange={(event) => {
@@ -117,18 +111,26 @@ export function PdfConversionForm({ config, kind, outputExtension }: PdfConversi
       {loading ? (
         <div className="flex flex-col items-center gap-3 py-8">
           <Loader2 className="h-8 w-8 animate-spin text-accent" />
-          <p className="text-sm text-text-muted">Convirtiendo a {outputExtension.toUpperCase()}...</p>
+          <p className="text-sm text-text-muted">Extrayendo texto y generando resumen con IA...</p>
         </div>
       ) : (
-        <div className="rounded-xl border border-border bg-bg-elevated px-4 py-4">
-          <p className="text-xs text-text-muted">Archivo de salida</p>
-          <p className="mt-1 text-sm font-medium text-white">{outputName}</p>
+        <div className="rounded-xl border border-accent/20 bg-accent/5 px-4 py-4">
+          <div className="flex items-start gap-3">
+            <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+            <div>
+              <p className="text-xs text-text-muted">Archivo de salida</p>
+              <p className="mt-1 text-sm font-medium text-white">{outputName}</p>
+              <p className="mt-2 text-xs leading-relaxed text-text-muted">
+                El resumen se genera con Gemini en el mismo idioma del documento. Máximo 10 MB por archivo.
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
       <div className="flex justify-end">
-        <ActionButton onClick={handleConvert} loading={loading}>
-          Convertir a {outputExtension.toUpperCase()}
+        <ActionButton onClick={handleSummarize} loading={loading}>
+          Generar resumen
         </ActionButton>
       </div>
 

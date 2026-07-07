@@ -1,4 +1,5 @@
 import { Badge } from '../components/Badge'
+import { BackButton } from '../components/BackButton'
 import { Hero } from '../components/Hero'
 import { FeaturesSection } from '../components/FeatureCard'
 import { PdfMergeForm } from '../components/PdfMergeForm'
@@ -8,6 +9,7 @@ export function UnirPdfPage({ config }: { config: ToolConfig }) {
   return (
     <div className="bg-glow min-h-screen">
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:py-16">
+        <BackButton />
         <div className="mb-8 flex justify-center">
           <Badge />
         </div>

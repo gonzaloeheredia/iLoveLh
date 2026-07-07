@@ -1,24 +1,29 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { Navbar } from './components/Navbar'
+import { ProtectedRoute } from './components/ProtectedRoute'
 import { HerramientasPage } from './pages/HerramientasPage'
 import { UnirPdfPage } from './pages/UnirPdfPage'
 import { SepararPdfPage } from './pages/SepararPdfPage'
 import { ConversionPage } from './pages/ConversionPage'
 import { HistorialPage } from './pages/HistorialPage'
 import { ReportarProblemaPage } from './pages/ReportarProblemaPage'
+import { ResumirPdfPage } from './pages/ResumirPdfPage'
+import { TraducirPdfPage } from './pages/TraducirPdfPage'
+import { LoginPage } from './pages/LoginPage'
 import { getToolById } from './types/tools'
 
-function App() {
+function AppLayout() {
   const unirConfig = getToolById('unir-pdf')!
   const separarConfig = getToolById('separar-pdf')!
   const pdfAWordConfig = getToolById('pdf-a-word')!
   const wordAPdfConfig = getToolById('word-a-pdf')!
+  const resumirConfig = getToolById('resumir-pdf')!
+  const traducirConfig = getToolById('traducir-pdf')!
 
   return (
     <>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Navigate to="/herramienta" replace />} />
         <Route path="/herramienta" element={<HerramientasPage />} />
         <Route path="/historial" element={<HistorialPage />} />
         <Route path="/reportar-problema" element={<ReportarProblemaPage />} />
@@ -34,6 +39,8 @@ function App() {
             />
           }
         />
+        <Route path="/resumir-pdf" element={<ResumirPdfPage config={resumirConfig} />} />
+        <Route path="/traducir-pdf" element={<TraducirPdfPage config={traducirConfig} />} />
         <Route
           path="/word-a-pdf"
           element={
@@ -44,8 +51,20 @@ function App() {
             />
           }
         />
+        <Route path="*" element={<Navigate to="/herramienta" replace />} />
       </Routes>
     </>
+  )
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<LoginPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/*" element={<AppLayout />} />
+      </Route>
+    </Routes>
   )
 }
 

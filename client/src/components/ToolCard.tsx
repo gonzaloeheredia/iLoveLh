@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FileText, Files, Scissors, ArrowRightLeft } from 'lucide-react'
+import { FileText, Files, Scissors, ArrowRightLeft, Sparkles, Languages } from 'lucide-react'
 import type { ToolId } from '../types/tools'
 
 const iconMap: Record<ToolId, typeof FileText> = {
@@ -7,6 +7,8 @@ const iconMap: Record<ToolId, typeof FileText> = {
   'separar-pdf': Scissors,
   'pdf-a-word': FileText,
   'word-a-pdf': ArrowRightLeft,
+  'resumir-pdf': Sparkles,
+  'traducir-pdf': Languages,
 }
 
 interface ToolCardProps {

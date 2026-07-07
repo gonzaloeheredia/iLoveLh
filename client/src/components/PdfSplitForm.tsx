@@ -34,6 +34,14 @@ export function PdfSplitForm() {
     }
   }
 
+  const clearFile = () => {
+    setFile(null)
+    setPageCount(null)
+    setStatus(null)
+    setRanges('')
+    setMode('all')
+  }
+
   const handleSplit = async () => {
     if (!file) return
 
@@ -90,19 +98,30 @@ export function PdfSplitForm() {
             {pageCount !== null && ` · ${pageCount} página${pageCount !== 1 ? 's' : ''}`}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            setFile(null)
-            setPageCount(null)
-            setStatus(null)
-            setRanges('')
-            setMode('all')
-          }}
-          className="text-sm text-text-muted transition-colors hover:text-white"
-        >
-          Cambiar
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={clearFile}
+            disabled={loading}
+            className="text-sm text-text-muted transition-colors hover:text-red-400 disabled:opacity-50"
+          >
+            Eliminar
+          </button>
+          <label className="cursor-pointer text-sm text-text-muted transition-colors hover:text-white">
+            Cambiar
+            <input
+              type="file"
+              accept=".pdf,application/pdf"
+              className="hidden"
+              disabled={loading}
+              onChange={(event) => {
+                const selected = event.target.files?.[0]
+                if (selected) void handleFile([selected])
+                event.target.value = ''
+              }}
+            />
+          </label>
+        </div>
       </div>
 
       <div className="space-y-4">

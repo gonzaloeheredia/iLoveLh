@@ -1,4 +1,10 @@
-export type ToolId = 'unir-pdf' | 'separar-pdf' | 'pdf-a-word' | 'word-a-pdf'
+export type ToolId =
+  | 'unir-pdf'
+  | 'separar-pdf'
+  | 'pdf-a-word'
+  | 'word-a-pdf'
+  | 'resumir-pdf'
+  | 'traducir-pdf'
 
 export interface Feature {
   title: string
@@ -128,6 +134,60 @@ export const tools: ToolConfig[] = [
       {
         title: 'Listo para compartir',
         description: 'Generá un PDF universal compatible con cualquier dispositivo.',
+      },
+    ],
+  },
+  {
+    id: 'resumir-pdf',
+    path: '/resumir-pdf',
+    titleWhite: 'Resumir',
+    titleAccent: 'PDF',
+    description:
+      'Generá un resumen claro del contenido de un PDF con IA. Ideal para contratos, escritos y documentos extensos.',
+    dropTitle: 'Arrastrá tu PDF aquí',
+    dropSubtitle: 'El documento debe contener texto seleccionable (no escaneado)',
+    buttonText: 'Seleccionar PDF',
+    accept: { 'application/pdf': ['.pdf'] },
+    multiple: false,
+    features: [
+      {
+        title: 'Resumen con IA',
+        description: 'Gemini analiza el texto y produce un resumen en el idioma del documento.',
+      },
+      {
+        title: 'PDF descargable',
+        description: 'Obtené un PDF con el resumen listo para compartir o archivar.',
+      },
+      {
+        title: 'Límite de 10 MB',
+        description: 'Pensado para documentos legales habituales y control de costo por tokens.',
+      },
+    ],
+  },
+  {
+    id: 'traducir-pdf',
+    path: '/traducir-pdf',
+    titleWhite: 'Traducir',
+    titleAccent: 'PDF',
+    description:
+      'Traducí un PDF completo a otro idioma con IA. El resultado es un PDF nuevo con el texto traducido, listo para leer o compartir.',
+    dropTitle: 'Arrastrá tu PDF aquí',
+    dropSubtitle: 'El documento debe contener texto seleccionable (no escaneado)',
+    buttonText: 'Seleccionar PDF',
+    accept: { 'application/pdf': ['.pdf'] },
+    multiple: false,
+    features: [
+      {
+        title: 'Traducción con IA',
+        description: 'Gemini traduce el contenido preservando párrafos y estructura general.',
+      },
+      {
+        title: 'Varios idiomas',
+        description: 'Elegí entre español, inglés, portugués, francés, alemán e italiano.',
+      },
+      {
+        title: 'Límite de 10 MB',
+        description: 'Documentos largos se procesan por lotes; puede tardar un poco más.',
       },
     ],
   },

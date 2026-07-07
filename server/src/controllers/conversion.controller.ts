@@ -34,6 +34,7 @@ async function handleConversion(
     const result = await convert({
       inputPath: req.file.path,
       originalName: req.file.originalname,
+      sourceMimeType: req.file.mimetype,
       workDir,
     })
 

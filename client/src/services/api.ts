@@ -68,9 +68,15 @@ async function convertFile(
   file: File,
   fallbackFilename: string,
   errorMessage: string,
+  extraFields?: Record<string, string>,
 ): Promise<ConversionResult> {
   const formData = new FormData()
   formData.append('file', file)
+  if (extraFields) {
+    for (const [key, value] of Object.entries(extraFields)) {
+      formData.append(key, value)
+    }
+  }
 
   const response = await fetch(apiUrl(endpoint), {
     method: 'POST',
@@ -109,6 +115,31 @@ export function wordToPdf(file: File): Promise<ConversionResult> {
     file,
     fallback,
     'Hubo un error al convertir el Word a PDF.',
+  )
+}
+
+export async function summarizePdf(file: File): Promise<ConversionResult> {
+  const fallback = file.name.replace(/\.pdf$/i, '-resumen.pdf')
+  return convertFile(
+    '/api/summarize',
+    file,
+    fallback,
+    'Hubo un error al generar el resumen del PDF.',
+  )
+}
+
+export async function translatePdf(
+  file: File,
+  targetLanguage: string,
+): Promise<ConversionResult> {
+  const languageSuffix = targetLanguage.split('-')[0].toUpperCase()
+  const fallback = file.name.replace(/\.pdf$/i, `_${languageSuffix}.pdf`)
+  return convertFile(
+    '/api/translate',
+    file,
+    fallback,
+    'Hubo un error al traducir el PDF.',
+    { targetLanguage },
   )
 }
 

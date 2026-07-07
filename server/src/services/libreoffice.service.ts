@@ -95,13 +95,17 @@ export async function verifyLibreOfficeOnStartup(): Promise<void> {
   libreOfficeAvailable = false
   console.warn(
     '⚠️  LibreOffice no está instalado o no se encontró en PATH. ' +
-      'Los endpoints /api/pdf-to-word y /api/word-to-pdf no estarán disponibles. ' +
+      'El endpoint /api/word-to-pdf no estará disponible. ' +
       'Instalá LibreOffice o configurá LIBREOFFICE_PATH en .env.',
   )
 }
 
 export function isLibreOfficeAvailable(): boolean {
   return libreOfficeAvailable
+}
+
+export function getLibreOfficePath(): string | null {
+  return libreOfficePath
 }
 
 function assertLibreOfficeAvailable(): void {
@@ -111,6 +115,34 @@ function assertLibreOfficeAvailable(): void {
       'LibreOffice no está disponible en el servidor. Contactá al administrador.',
     )
   }
+}
+
+/** Strip system Python vars so LibreOffice uses its bundled interpreter. */
+const PYTHON_ENV_VARS = [
+  'PYTHONHOME',
+  'PYTHONPATH',
+  'PYTHONUSERBASE',
+  'PYTHONEXECUTABLE',
+  'PYTHONNOUSERSITE',
+  'PYTHONSTARTUP',
+  'VIRTUAL_ENV',
+] as const
+
+function buildLibreOfficeEnv(): NodeJS.ProcessEnv {
+  const childEnv = { ...process.env }
+
+  for (const key of PYTHON_ENV_VARS) {
+    delete childEnv[key]
+  }
+
+  childEnv.HOME = childEnv.HOME ?? childEnv.USERPROFILE ?? os.tmpdir()
+
+  return childEnv
+}
+
+function formatCommandForLog(binaryPath: string, args: string[]): string {
+  const quote = (value: string) => (/\s/.test(value) ? `"${value}"` : value)
+  return [quote(binaryPath), ...args.map(quote)].join(' ')
 }
 
 function runLibreOfficeConvert(
@@ -132,13 +164,12 @@ function runLibreOfficeConvert(
       inputPath,
     ]
 
+    console.log(`[LibreOffice] ${formatCommandForLog(libreOfficePath!, args)}`)
+
     const proc = spawn(libreOfficePath!, args, {
       stdio: ['ignore', 'pipe', 'pipe'],
       windowsHide: true,
-      env: {
-        ...process.env,
-        HOME: process.env.HOME ?? os.tmpdir(),
-      },
+      env: buildLibreOfficeEnv(),
     })
 
     let stderr = ''
@@ -183,6 +214,10 @@ export async function convertWithLibreOffice(
 
   const baseName = path.basename(inputPath, path.extname(inputPath))
   const outputPath = path.join(outputDir, `${baseName}.${expectedExtension}`)
+
+  console.log(
+    `[LibreOffice] output expected: ${baseName}.${expectedExtension} (from staged basename "${baseName}")`,
+  )
 
   if (!fs.existsSync(outputPath)) {
     const generated = fs

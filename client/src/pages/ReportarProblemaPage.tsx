@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Badge } from '../components/Badge'
+import { BackButton } from '../components/BackButton'
 import { ScreenshotUpload } from '../components/ScreenshotUpload'
 import { ActionButton, StatusMessage } from '../components/ActionButton'
 import { submitReport } from '../services/reportService'
@@ -40,6 +41,7 @@ export function ReportarProblemaPage() {
   return (
     <div className="bg-glow min-h-screen">
       <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:py-16">
+        <BackButton />
         <div className="mb-8 flex justify-center">
           <Badge />
         </div>

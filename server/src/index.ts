@@ -1,9 +1,15 @@
 import { createApp } from './app.js'
 import { env } from './config/env.js'
 import { verifyLibreOfficeOnStartup } from './services/libreoffice.service.js'
+import { verifyPdf2DocxOnStartup } from './services/pdf2docx.service.js'
+import { verifyGeminiOnStartup } from './services/gemini.service.js'
 
 async function main() {
-  await verifyLibreOfficeOnStartup()
+  await Promise.all([
+    verifyLibreOfficeOnStartup(),
+    verifyPdf2DocxOnStartup(),
+    verifyGeminiOnStartup(),
+  ])
 
   const app = createApp()
 
