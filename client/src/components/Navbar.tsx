@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { PAGE_X_PADDING } from './PageContainer'
 import { tools } from '../types/tools'
 import { Logo } from './Logo'
 import { logout } from '../auth/session'
@@ -9,7 +10,11 @@ const navLinks = [
   { label: 'Reportar un problema', href: '/reportar-problema' },
 ]
 
-export function Navbar() {
+interface NavbarProps {
+  variant?: 'default' | 'minimal'
+}
+
+export function Navbar({ variant = 'default' }: NavbarProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const isHerramienta =
@@ -23,10 +28,15 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-bg-dark/80 backdrop-blur-md">
-      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Logo />
+    <header className="sticky top-0 z-50 overflow-visible border-b border-border bg-bg-dark/95 backdrop-blur-md">
+      <nav
+        className={`mx-auto flex w-full max-w-7xl items-center ${PAGE_X_PADDING} ${
+          variant === 'minimal' ? 'min-h-20 py-4' : 'h-16 py-3'
+        } ${variant === 'minimal' ? 'justify-start' : 'justify-between'}`}
+      >
+        <Logo to={variant === 'minimal' ? '/' : '/herramienta'} />
 
+        {variant === 'minimal' ? null : (
         <div className="flex items-center gap-6 sm:gap-8">
           {navLinks.map((link) => {
             const isActive =
@@ -62,6 +72,7 @@ export function Navbar() {
             Salir
           </button>
         </div>
+        )}
       </nav>
     </header>
   )

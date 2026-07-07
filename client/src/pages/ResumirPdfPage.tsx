@@ -2,33 +2,32 @@ import { Badge } from '../components/Badge'
 import { BackButton } from '../components/BackButton'
 import { Hero } from '../components/Hero'
 import { FeaturesSection } from '../components/FeatureCard'
+import { PageContainer } from '../components/PageContainer'
 import { PdfSummarizeForm } from '../components/PdfSummarizeForm'
 import type { ToolConfig } from '../types/tools'
 
 export function ResumirPdfPage({ config }: { config: ToolConfig }) {
   return (
-    <div className="bg-glow min-h-screen">
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:py-16">
-        <BackButton />
+    <PageContainer>
+      <BackButton />
 
-        <div className="mb-8 flex justify-center">
-          <Badge />
-        </div>
-
-        <Hero
-          titleWhite={config.titleWhite}
-          titleAccent={config.titleAccent}
-          description={config.description}
-        />
-
-        <div className="mt-12">
-          <PdfSummarizeForm config={config} />
-        </div>
-
-        <div className="mt-16">
-          <FeaturesSection features={config.features} />
-        </div>
+      <div className="mb-10 flex justify-center">
+        <Badge />
       </div>
-    </div>
+
+      <Hero
+        titleWhite={config.titleWhite}
+        titleAccent={config.titleAccent}
+        description={config.description}
+      />
+
+      <div className="mt-14">
+        <PdfSummarizeForm config={config} />
+      </div>
+
+      <div className="mt-20">
+        <FeaturesSection features={config.features} />
+      </div>
+    </PageContainer>
   )
 }

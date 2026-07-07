@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { Navbar } from './components/Navbar'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { HerramientasPage } from './pages/HerramientasPage'
@@ -58,13 +58,19 @@ function AppLayout() {
 }
 
 function App() {
+  const location = useLocation()
+  const isLoginPage = location.pathname === '/'
+
   return (
-    <Routes>
-      <Route path="/" element={<LoginPage />} />
-      <Route element={<ProtectedRoute />}>
-        <Route path="/*" element={<AppLayout />} />
-      </Route>
-    </Routes>
+    <>
+      {isLoginPage && <Navbar variant="minimal" />}
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/*" element={<AppLayout />} />
+        </Route>
+      </Routes>
+    </>
   )
 }
 

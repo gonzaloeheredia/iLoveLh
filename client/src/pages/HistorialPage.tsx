@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { PageContainer } from '../components/PageContainer'
 import { Badge } from '../components/Badge'
 import { BackButton } from '../components/BackButton'
 import { ConfirmDialog } from '../components/ConfirmDialog'
@@ -140,12 +141,11 @@ export function HistorialPage() {
   }
 
   return (
-    <div className="bg-glow min-h-screen">
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:py-16">
-        <BackButton />
-        <div className="mb-8 flex justify-center">
-          <Badge />
-        </div>
+    <PageContainer>
+      <BackButton />
+      <div className="mb-10 flex justify-center">
+        <Badge />
+      </div>
 
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
@@ -158,7 +158,7 @@ export function HistorialPage() {
           </p>
         </div>
 
-        <div className="mt-12">
+        <div className="mt-14">
           {loading && (
             <div className="flex flex-col items-center gap-3 py-16">
               <Loader2 className="h-8 w-8 animate-spin text-accent" />
@@ -197,7 +197,6 @@ export function HistorialPage() {
             </div>
           )}
         </div>
-      </div>
 
       <ConfirmDialog
         open={pendingDelete !== null}
@@ -219,6 +218,6 @@ export function HistorialPage() {
           if (deletingId === null) setPendingDelete(null)
         }}
       />
-    </div>
+    </PageContainer>
   )
 }
