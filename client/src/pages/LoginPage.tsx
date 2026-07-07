@@ -60,7 +60,7 @@ export function LoginPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="mx-auto mt-14 max-w-xl sm:mt-[4.5rem] lg:mt-20"
+          className="mx-auto mt-14 max-w-md sm:mt-[4.5rem] lg:mt-20"
         >
           <div className="overflow-hidden rounded-2xl border border-border bg-bg-card transition-colors hover:border-accent/50">
             <LoginFieldRow icon={Mail}>
