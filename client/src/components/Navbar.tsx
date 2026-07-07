@@ -31,7 +31,7 @@ export function Navbar({ variant = 'default' }: NavbarProps) {
     <header className="sticky top-0 z-50 overflow-visible border-b border-border bg-bg-dark/95 backdrop-blur-md">
       <nav
         className={`mx-auto flex w-full max-w-7xl items-center ${PAGE_X_PADDING} ${
-          variant === 'minimal' ? 'min-h-20 py-4' : 'h-16 py-3'
+          variant === 'minimal' ? 'h-20' : 'h-16'
         } ${variant === 'minimal' ? 'justify-start' : 'justify-between'}`}
       >
         <Logo to={variant === 'minimal' ? '/' : '/herramienta'} />

@@ -62,15 +62,17 @@ function App() {
   const isLoginPage = location.pathname === '/'
 
   return (
-    <>
+    <div className="flex min-h-svh flex-col">
       {isLoginPage && <Navbar variant="minimal" />}
-      <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="/*" element={<AppLayout />} />
-        </Route>
-      </Routes>
-    </>
+      <main className="flex flex-1 flex-col">
+        <Routes>
+          <Route path="/" element={<LoginPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/*" element={<AppLayout />} />
+          </Route>
+        </Routes>
+      </main>
+    </div>
   )
 }
 

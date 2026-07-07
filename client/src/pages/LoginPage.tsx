@@ -44,7 +44,7 @@ export function LoginPage() {
 
   return (
     <div
-      className={`bg-glow flex min-h-[calc(100svh-5rem)] items-center justify-center ${PAGE_X_PADDING} ${PAGE_Y_PADDING}`}
+      className={`bg-glow flex flex-1 items-center justify-center ${PAGE_X_PADDING} ${PAGE_Y_PADDING}`}
     >
       <div className="w-full max-w-3xl">
         <div className="mx-auto max-w-4xl text-center">
